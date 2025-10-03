@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Markdown Viewer",
   description: "A simple markdown viewer with mermaidjs support",
+  metadataBase: new URL("https://md.built.systems"),
 };
 
 export default function RootLayout({
