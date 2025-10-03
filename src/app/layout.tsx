@@ -1,5 +1,8 @@
+// biome-ignore assist/source/organizeImports: react-scan must load before react imports
+import { ReactScan } from "@/components/ReactScan";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -85,13 +88,17 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <ReactScan />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <script
+        <Script
+          id="ld-json"
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+          strategy="beforeInteractive"
+        >
+          {JSON.stringify(jsonLd)}
+        </Script>
         {children}
       </body>
     </html>
