@@ -230,10 +230,10 @@ export default function MarkdownPreview() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-4 px-4 py-6">
-        <header className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-lg)] border border-border bg-card px-4 py-3">
-          <span className="text-sm font-semibold uppercase tracking-[var(--tracking-normal)] text-muted-foreground">
+        <header className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-lg)] border border-border bg-card px-4 py-3" role="banner">
+          <h1 className="text-sm font-semibold uppercase tracking-[var(--tracking-normal)] text-muted-foreground">
             Markdown Workspace
-          </span>
+          </h1>
           <div className="flex flex-wrap items-center gap-2">
             <nav className="flex overflow-hidden rounded-[var(--radius-lg)] border border-border">
               {viewOptions.map((mode) => {
