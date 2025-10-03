@@ -168,10 +168,7 @@ export default function MarkdownPreview() {
       const relativeX = (event.clientX - rect.left) / rect.width;
 
       if (dragState.current.type === "split") {
-        const clamped = Math.min(
-          Math.max(relativeX, MIN_SPLIT),
-          MAX_SPLIT,
-        );
+        const clamped = Math.min(Math.max(relativeX, MIN_SPLIT), MAX_SPLIT);
         setSplitRatio(clamped);
       }
       if (dragState.current.type === "preview") {
@@ -230,7 +227,10 @@ export default function MarkdownPreview() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-4 px-4 py-6 md:px-6 md:py-8">
-        <header className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-lg)] border border-border bg-card px-4 py-3" role="banner">
+        <header
+          className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-lg)] border border-border bg-card px-4 py-3"
+          role="banner"
+        >
           <h1 className="text-sm font-semibold uppercase tracking-[var(--tracking-normal)] text-muted-foreground">
             Markdown Workspace
           </h1>
@@ -307,7 +307,9 @@ export default function MarkdownPreview() {
                     Preview
                   </h2>
                   {isRendering && (
-                    <span className="text-xs text-muted-foreground">Rendering…</span>
+                    <span className="text-xs text-muted-foreground">
+                      Rendering…
+                    </span>
                   )}
                 </div>
                 <div
@@ -353,7 +355,9 @@ export default function MarkdownPreview() {
                     Preview
                   </h2>
                   {isRendering && (
-                    <span className="text-xs text-muted-foreground">Rendering…</span>
+                    <span className="text-xs text-muted-foreground">
+                      Rendering…
+                    </span>
                   )}
                 </div>
                 <div

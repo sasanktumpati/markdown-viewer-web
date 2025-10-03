@@ -14,8 +14,17 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Live Markdown Editor & Viewer with Mermaid Diagrams",
-  description: "Free online markdown editor and viewer with live preview, Mermaid diagram support, and syntax highlighting. No signup required.",
-  keywords: ["markdown", "editor", "viewer", "live preview", "mermaid", "diagrams", "syntax highlighting"],
+  description:
+    "Free online markdown editor and viewer with live preview, Mermaid diagram support, and syntax highlighting. No signup required.",
+  keywords: [
+    "markdown",
+    "editor",
+    "viewer",
+    "live preview",
+    "mermaid",
+    "diagrams",
+    "syntax highlighting",
+  ],
   authors: [{ name: "sasanktumpati" }],
   metadataBase: new URL("https://md.built.systems"),
   alternates: {
@@ -23,7 +32,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Live Markdown Editor & Viewer with Mermaid Diagrams",
-    description: "Free online markdown editor and viewer with live preview, Mermaid diagram support, and syntax highlighting. No signup required.",
+    description:
+      "Free online markdown editor and viewer with live preview, Mermaid diagram support, and syntax highlighting. No signup required.",
     url: "https://md.built.systems",
     siteName: "Markdown Viewer",
     locale: "en_US",
@@ -32,7 +42,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Live Markdown Editor & Viewer with Mermaid Diagrams",
-    description: "Free online markdown editor and viewer with live preview, Mermaid diagram support, and syntax highlighting. No signup required.",
+    description:
+      "Free online markdown editor and viewer with live preview, Mermaid diagram support, and syntax highlighting. No signup required.",
   },
   robots: {
     index: true,
@@ -56,19 +67,20 @@ export default function RootLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "Markdown Viewer",
-    "url": "https://md.built.systems",
-    "description": "Free online markdown editor and viewer with live preview, Mermaid diagram support, and syntax highlighting. No signup required.",
-    "applicationCategory": "DeveloperApplication",
-    "operatingSystem": "Any",
-    "featureList": [
+    name: "Markdown Viewer",
+    url: "https://md.built.systems",
+    description:
+      "Free online markdown editor and viewer with live preview, Mermaid diagram support, and syntax highlighting. No signup required.",
+    applicationCategory: "DeveloperApplication",
+    operatingSystem: "Any",
+    featureList: [
       "Live markdown preview",
       "Mermaid diagram rendering",
       "Syntax highlighting for code blocks",
       "Resizable split view editor",
       "Local storage persistence",
-      "No signup required"
-    ]
+      "No signup required",
+    ],
   };
 
   return (
