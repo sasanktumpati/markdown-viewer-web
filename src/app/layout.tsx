@@ -16,6 +16,19 @@ export const metadata: Metadata = {
   title: "Markdown Viewer",
   description: "A simple markdown viewer with mermaidjs support",
   metadataBase: new URL("https://md.built.systems"),
+  openGraph: {
+    title: "Markdown Viewer",
+    description: "A simple markdown viewer with mermaidjs support",
+    url: "https://md.built.systems",
+    siteName: "Markdown Viewer",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Markdown Viewer",
+    description: "A simple markdown viewer with mermaidjs support",
+  },
 };
 
 export default function RootLayout({
