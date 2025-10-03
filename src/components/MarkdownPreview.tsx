@@ -229,13 +229,13 @@ export default function MarkdownPreview() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-4 px-4 py-6">
+      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-4 px-4 py-6 md:px-6 md:py-8">
         <header className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-lg)] border border-border bg-card px-4 py-3" role="banner">
           <h1 className="text-sm font-semibold uppercase tracking-[var(--tracking-normal)] text-muted-foreground">
             Markdown Workspace
           </h1>
           <div className="flex flex-wrap items-center gap-2">
-            <nav className="flex overflow-hidden rounded-[var(--radius-lg)] border border-border">
+            <nav className="flex flex-wrap overflow-hidden rounded-[var(--radius-lg)] border border-border">
               {viewOptions.map((mode) => {
                 const isActive = mode.value === viewmode;
                 return (
@@ -262,14 +262,14 @@ export default function MarkdownPreview() {
           className="flex-1 rounded-[var(--radius-lg)] border border-border bg-card"
         >
           {viewmode === "split" && (
-            <div className="flex h-full min-h-[65vh] w-full items-stretch">
+            <div className="flex h-full min-h-[65vh] w-full items-stretch flex-col-mobile">
               <section
                 style={{
                   flexBasis: `${splitRatio * 100}%`,
                   flexGrow: 0,
                   flexShrink: 0,
                 }}
-                className="flex min-w-[240px] flex-col border-r border-border"
+                className="flex min-w-[240px] flex-col border-r border-border md:border-r-0"
               >
                 <div className="border-b border-border px-4 py-3">
                   <h2 className="text-xs font-semibold uppercase tracking-[var(--tracking-normal)] text-muted-foreground">
@@ -288,9 +288,10 @@ export default function MarkdownPreview() {
 
               <div
                 onPointerDown={startSplitResize}
-                className="relative w-2 cursor-col-resize select-none"
+                className="relative w-2 cursor-col-resize select-none md:cursor-row-resize"
               >
-                <div className="absolute inset-y-0 left-1/2 -ml-px w-px bg-border" />
+                <div className="absolute inset-y-0 left-1/2 -ml-px w-px bg-border md:hidden" />
+                <div className="absolute inset-x-0 top-1/2 -mt-px h-px bg-border hidden md:block" />
               </div>
 
               <section
@@ -299,7 +300,7 @@ export default function MarkdownPreview() {
                   flexGrow: 0,
                   flexShrink: 0,
                 }}
-                className="flex min-w-[240px] flex-col"
+                className="flex min-w-[240px] flex-col md:border-t md:border-border"
               >
                 <div className="flex items-center justify-between border-b border-border px-4 py-3">
                   <h2 className="text-xs font-semibold uppercase tracking-[var(--tracking-normal)] text-muted-foreground">
@@ -345,7 +346,7 @@ export default function MarkdownPreview() {
                   maxWidth: "960px",
                   minWidth: "280px",
                 }}
-                className="relative flex flex-col border border-border"
+                className="relative flex flex-col border border-border w-full md:w-auto"
               >
                 <div className="flex items-center justify-between border-b border-border px-4 py-3">
                   <h2 className="text-xs font-semibold uppercase tracking-[var(--tracking-normal)] text-muted-foreground">
