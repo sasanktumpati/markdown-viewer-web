@@ -1,12 +1,6 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-@media (max-width: 768px) {
-  .flex-col-mobile {
-    flex-direction: column;
-  }
-}
-
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.1448 0 0);

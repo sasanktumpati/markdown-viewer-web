@@ -32,6 +32,14 @@ export default function MarkdownPreview() {
   const setPreviewWidthRatio = useWorkspaceStore(
     (state) => state.setPreviewWidthRatio,
   );
+  const isMobile = useWorkspaceStore((state) => state.isMobile);
+  const setIsMobile = useWorkspaceStore((state) => state.setIsMobile);
+  const isPreviewFullWidth = useWorkspaceStore(
+    (state) => state.isPreviewFullWidth,
+  );
+  const setIsPreviewFullWidth = useWorkspaceStore(
+    (state) => state.setIsPreviewFullWidth,
+  );
 
   const [html, setHtml] = useState("");
   const [isRendering, setIsRendering] = useState(false);
@@ -39,6 +47,15 @@ export default function MarkdownPreview() {
   const containerRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const dragState = useRef<null | { type: "split" | "preview" }>(null);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, [setIsMobile]);
 
   useEffect(() => {
     if (typeof document === "undefined") {
@@ -162,13 +179,15 @@ export default function MarkdownPreview() {
         return;
       }
       const rect = container.getBoundingClientRect();
-      if (rect.width === 0) {
+      if (rect.width === 0 || rect.height === 0) {
         return;
       }
       const relativeX = (event.clientX - rect.left) / rect.width;
+      const relativeY = (event.clientY - rect.top) / rect.height;
 
       if (dragState.current.type === "split") {
-        const clamped = Math.min(Math.max(relativeX, MIN_SPLIT), MAX_SPLIT);
+        const ratio = isMobile ? relativeY : relativeX;
+        const clamped = Math.min(Math.max(ratio, MIN_SPLIT), MAX_SPLIT);
         setSplitRatio(clamped);
       }
       if (dragState.current.type === "preview") {
@@ -193,7 +212,7 @@ export default function MarkdownPreview() {
       window.removeEventListener("pointerup", clearDrag);
       window.removeEventListener("pointercancel", clearDrag);
     };
-  }, [setPreviewWidthRatio, setSplitRatio]);
+  }, [setPreviewWidthRatio, setSplitRatio, isMobile]);
 
   const startSplitResize = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (viewmode !== "split") {
@@ -226,35 +245,33 @@ export default function MarkdownPreview() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-4 px-4 py-6 md:px-6 md:py-8">
+      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-3 px-3 py-4 sm:gap-4 sm:px-4 sm:py-6 md:px-6 md:py-8">
         <header
-          className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-lg)] border border-border bg-card px-4 py-3"
+          className="flex flex-col items-start gap-3 rounded-[var(--radius-lg)] border border-border bg-card px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4"
           role="banner"
         >
           <h1 className="text-sm font-semibold uppercase tracking-[var(--tracking-normal)] text-muted-foreground">
             Markdown Workspace
           </h1>
-          <div className="flex flex-wrap items-center gap-2">
-            <nav className="flex flex-wrap overflow-hidden rounded-[var(--radius-lg)] border border-border">
-              {viewOptions.map((mode) => {
-                const isActive = mode.value === viewmode;
-                return (
-                  <button
-                    key={mode.value}
-                    type="button"
-                    onClick={() => setViewMode(mode.value)}
-                    className={`px-3 py-2 text-sm transition-colors ${
-                      isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {mode.label}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
+          <nav className="flex w-full overflow-hidden rounded-[var(--radius-lg)] border border-border sm:w-auto">
+            {viewOptions.map((mode) => {
+              const isActive = mode.value === viewmode;
+              return (
+                <button
+                  key={mode.value}
+                  type="button"
+                  onClick={() => setViewMode(mode.value)}
+                  className={`flex-1 px-3 py-2 text-sm transition-colors sm:flex-none ${
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {mode.label}
+                </button>
+              );
+            })}
+          </nav>
         </header>
 
         <main
@@ -262,16 +279,21 @@ export default function MarkdownPreview() {
           className="flex-1 rounded-[var(--radius-lg)] border border-border bg-card"
         >
           {viewmode === "split" && (
-            <div className="flex h-full min-h-[65vh] w-full items-stretch flex-col-mobile">
+            <div
+              className="flex h-full w-full items-stretch"
+              style={{
+                flexDirection: isMobile ? "column" : "row",
+                minHeight: isMobile ? "calc(100vh - 180px)" : "65vh"
+              }}
+            >
               <section
                 style={{
-                  flexBasis: `${splitRatio * 100}%`,
-                  flexGrow: 0,
-                  flexShrink: 0,
+                  height: isMobile ? `${splitRatio * 100}%` : "auto",
+                  width: isMobile ? "100%" : `${splitRatio * 100}%`,
                 }}
-                className="flex min-w-[240px] flex-col border-r border-border md:border-r-0"
+                className="flex flex-col"
               >
-                <div className="border-b border-border px-4 py-3">
+                <div className="border-b border-border px-3 py-2.5 sm:px-4 sm:py-3">
                   <h2 className="text-xs font-semibold uppercase tracking-[var(--tracking-normal)] text-muted-foreground">
                     Editor
                   </h2>
@@ -282,27 +304,39 @@ export default function MarkdownPreview() {
                   onChange={(event) => setMarkdown(event.target.value)}
                   placeholder="Type Markdown here..."
                   spellCheck="false"
-                  className="flex-1 resize-none bg-transparent px-4 py-4 font-mono text-base leading-relaxed text-foreground focus:outline-none"
+                  className="flex-1 resize-none bg-transparent px-3 py-3 font-mono text-sm leading-relaxed text-foreground focus:outline-none sm:px-4 sm:py-4 sm:text-base"
                 />
               </section>
 
               <div
                 onPointerDown={startSplitResize}
-                className="relative w-2 cursor-col-resize select-none md:cursor-row-resize"
+                className="relative select-none touch-none"
+                style={{
+                  width: isMobile ? "100%" : "8px",
+                  height: isMobile ? "16px" : "auto",
+                  cursor: isMobile ? "row-resize" : "col-resize",
+                }}
               >
-                <div className="absolute inset-y-0 left-1/2 -ml-px w-px bg-border md:hidden" />
-                <div className="absolute inset-x-0 top-1/2 -mt-px h-px bg-border hidden md:block" />
+                <div
+                  className="absolute bg-border"
+                  style={{
+                    width: isMobile ? "100%" : "1px",
+                    height: isMobile ? "1px" : "100%",
+                    top: isMobile ? "50%" : "0",
+                    left: isMobile ? "0" : "50%",
+                    transform: isMobile ? "translateY(-50%)" : "translateX(-50%)",
+                  }}
+                />
               </div>
 
               <section
                 style={{
-                  flexBasis: `${(1 - splitRatio) * 100}%`,
-                  flexGrow: 0,
-                  flexShrink: 0,
+                  height: isMobile ? `${(1 - splitRatio) * 100}%` : "auto",
+                  width: isMobile ? "100%" : `${(1 - splitRatio) * 100}%`,
                 }}
-                className="flex min-w-[240px] flex-col md:border-t md:border-border"
+                className="flex flex-col"
               >
-                <div className="flex items-center justify-between border-b border-border px-4 py-3">
+                <div className="flex items-center justify-between border-b border-border px-3 py-2.5 sm:px-4 sm:py-3">
                   <h2 className="text-xs font-semibold uppercase tracking-[var(--tracking-normal)] text-muted-foreground">
                     Preview
                   </h2>
@@ -314,7 +348,7 @@ export default function MarkdownPreview() {
                 </div>
                 <div
                   ref={previewRef}
-                  className="prose prose-neutral max-w-none flex-1 overflow-auto px-4 py-4 text-base leading-relaxed prose-code:rounded prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-pre:bg-muted"
+                  className="prose prose-neutral prose-sm max-w-none flex-1 overflow-auto px-3 py-3 leading-relaxed prose-code:rounded prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-pre:bg-muted sm:prose-base sm:px-4 sm:py-4"
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML is sanitized by marked.js and mermaid.js
                   dangerouslySetInnerHTML={{ __html: previewContent }}
                 />
@@ -323,8 +357,11 @@ export default function MarkdownPreview() {
           )}
 
           {viewmode === "editor" && (
-            <section className="flex h-full min-h-[65vh] flex-col">
-              <div className="border-b border-border px-4 py-3">
+            <section
+              className="flex h-full flex-col"
+              style={{ minHeight: isMobile ? "calc(100vh - 180px)" : "65vh" }}
+            >
+              <div className="border-b border-border px-3 py-2.5 sm:px-4 sm:py-3">
                 <h2 className="text-xs font-semibold uppercase tracking-[var(--tracking-normal)] text-muted-foreground">
                   Editor
                 </h2>
@@ -335,43 +372,94 @@ export default function MarkdownPreview() {
                 onChange={(event) => setMarkdown(event.target.value)}
                 placeholder="Type Markdown here..."
                 spellCheck="false"
-                className="flex-1 resize-none bg-transparent px-4 py-4 font-mono text-base leading-relaxed text-foreground focus:outline-none"
+                className="flex-1 resize-none bg-transparent px-3 py-3 font-mono text-sm leading-relaxed text-foreground focus:outline-none sm:px-4 sm:py-4 sm:text-base"
               />
             </section>
           )}
 
           {viewmode === "preview" && (
-            <div className="flex h-full min-h-[65vh] w-full items-stretch justify-center px-4 py-6">
+            <div
+              className="flex h-full w-full items-stretch justify-center px-3 py-4 sm:px-4 sm:py-6"
+              style={{ minHeight: isMobile ? "calc(100vh - 180px)" : "65vh" }}
+            >
               <section
                 style={{
-                  width: `${Math.round(previewWidthRatio * 100)}%`,
-                  maxWidth: "960px",
-                  minWidth: "280px",
+                  width: isPreviewFullWidth || isMobile ? "100%" : `${Math.round(previewWidthRatio * 100)}%`,
+                  maxWidth: isPreviewFullWidth || isMobile ? "100%" : "960px",
+                  minWidth: isMobile ? "100%" : "280px",
                 }}
-                className="relative flex flex-col border border-border w-full md:w-auto"
+                className="relative flex flex-col border border-border w-full"
               >
-                <div className="flex items-center justify-between border-b border-border px-4 py-3">
+                <div className="flex items-center justify-between border-b border-border px-3 py-2.5 sm:px-4 sm:py-3">
                   <h2 className="text-xs font-semibold uppercase tracking-[var(--tracking-normal)] text-muted-foreground">
                     Preview
                   </h2>
-                  {isRendering && (
-                    <span className="text-xs text-muted-foreground">
-                      Rendering…
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    {isRendering && (
+                      <span className="text-xs text-muted-foreground">
+                        Rendering…
+                      </span>
+                    )}
+                    {!isMobile && (
+                      <button
+                        type="button"
+                        onClick={() => setIsPreviewFullWidth(!isPreviewFullWidth)}
+                        className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        title={isPreviewFullWidth ? "Resize preview" : "Full width"}
+                      >
+                      {isPreviewFullWidth ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="4 14 10 14 10 20" />
+                          <polyline points="20 10 14 10 14 4" />
+                          <line x1="14" y1="10" x2="21" y2="3" />
+                          <line x1="3" y1="21" x2="10" y2="14" />
+                        </svg>
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="15 3 21 3 21 9" />
+                          <polyline points="9 21 3 21 3 15" />
+                          <line x1="21" y1="3" x2="14" y2="10" />
+                          <line x1="3" y1="21" x2="10" y2="14" />
+                        </svg>
+                      )}
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div
                   ref={previewRef}
-                  className="prose prose-neutral max-w-none flex-1 overflow-auto px-4 py-4 text-base leading-relaxed prose-code:rounded prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-pre:bg-muted"
+                  className="prose prose-neutral prose-sm max-w-none flex-1 overflow-auto px-3 py-3 leading-relaxed prose-code:rounded prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-pre:bg-muted sm:prose-base sm:px-4 sm:py-4"
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML is sanitized by DOMPurify before rendering
                   dangerouslySetInnerHTML={{ __html: previewContent }}
                 />
-                <div
-                  onPointerDown={startPreviewResize}
-                  className="absolute inset-y-0 right-0 w-2 cursor-col-resize select-none"
-                >
-                  <span className="absolute inset-y-0 left-1/2 -ml-px w-px bg-border" />
-                </div>
+                {!isPreviewFullWidth && !isMobile && (
+                  <div
+                    onPointerDown={startPreviewResize}
+                    className="absolute inset-y-0 right-0 w-2 cursor-col-resize select-none touch-none"
+                  >
+                    <span className="absolute inset-y-0 left-1/2 -ml-px w-px bg-border" />
+                  </div>
+                )}
               </section>
             </div>
           )}
