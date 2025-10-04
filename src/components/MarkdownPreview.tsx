@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { useEffect, useMemo } from "react";
 
 import { EditorPane } from "@/components/workspace/EditorPane";
@@ -100,21 +101,40 @@ export default function MarkdownPreview() {
     [isMobile],
   );
 
-  const previewWidth = useMemo(() => {
-    if (isPreviewFullWidth || isMobile) {
-      return "100%";
+  const previewStyle = useMemo<CSSProperties>(() => {
+    if (isMobile) {
+      return {
+        width: "100%",
+        minWidth: "100%",
+        maxWidth: "100%",
+        flexGrow: 1,
+        flexShrink: 1,
+        flexBasis: "auto",
+      } satisfies CSSProperties;
     }
-    return `${Math.round(previewWidthRatio * 100)}%`;
-  }, [isMobile, isPreviewFullWidth, previewWidthRatio]);
 
-  const previewStyle = useMemo(
-    () => ({
-      width: previewWidth,
-      maxWidth: isPreviewFullWidth || isMobile ? "100%" : PREVIEW_MAX_WIDTH,
-      minWidth: isMobile ? "100%" : PREVIEW_MIN_WIDTH,
-    }),
-    [isMobile, isPreviewFullWidth, previewWidth],
-  );
+    if (isPreviewFullWidth) {
+      return {
+        width: "100%",
+        maxWidth: PREVIEW_MAX_WIDTH,
+        minWidth: PREVIEW_MIN_WIDTH,
+        flexGrow: 1,
+        flexShrink: 1,
+        flexBasis: "auto",
+      } satisfies CSSProperties;
+    }
+
+    const widthPercent = `${Math.round(previewWidthRatio * 100)}%`;
+
+    return {
+      width: widthPercent,
+      maxWidth: PREVIEW_MAX_WIDTH,
+      minWidth: PREVIEW_MIN_WIDTH,
+      flexGrow: 0,
+      flexShrink: 0,
+      flexBasis: widthPercent,
+    } satisfies CSSProperties;
+  }, [isMobile, isPreviewFullWidth, previewWidthRatio]);
 
   const previewActions = !isMobile ? (
     <PreviewWidthToggle
@@ -130,7 +150,7 @@ export default function MarkdownPreview() {
 
         <main
           ref={containerRef}
-          className="flex-1 rounded-[var(--radius-lg)] border border-border bg-card"
+          className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[var(--radius-lg)] border border-border bg-card"
         >
           {viewMode === "split" && (
             <SplitView
@@ -155,14 +175,14 @@ export default function MarkdownPreview() {
 
           {viewMode === "preview" && (
             <div
-              className="flex h-full w-full items-stretch justify-center px-3 py-4 sm:px-4 sm:py-6"
+              className="flex min-h-0 flex-1 items-stretch justify-center px-3 py-4 sm:px-4 sm:py-6"
               style={{ minHeight }}
             >
               <PreviewPane
                 html={fallbackHtml}
                 isRendering={isRendering}
                 style={previewStyle}
-                className="w-full border border-border"
+                className="border border-border"
                 actions={previewActions}
                 showResizeHandle={!isPreviewFullWidth && !isMobile}
                 onResizeHandleDown={startPreviewResize}

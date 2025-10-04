@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+import { createDeferredStateStorage } from "@/store/createDeferredStateStorage";
+
 export type ViewMode = "split" | "editor" | "preview";
 
 type WorkspaceState = {
@@ -20,6 +22,10 @@ type WorkspaceState = {
 
 const STORAGE_KEY = "markdown-workspace";
 
+const storage = createJSONStorage(() =>
+  createDeferredStateStorage({ flushDelayMs: 200 }),
+);
+
 export const useWorkspaceStore = create<WorkspaceState>()(
   persist(
     (set) => ({
@@ -38,10 +44,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
     }),
     {
       name: STORAGE_KEY,
-      storage:
-        typeof window !== "undefined"
-          ? createJSONStorage(() => window.localStorage)
-          : undefined,
+      storage,
       partialize: (state) => ({
         markdown: state.markdown,
         viewMode: state.viewMode,

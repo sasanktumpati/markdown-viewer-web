@@ -17,7 +17,7 @@ export function EditorPane({
   className,
   textareaId,
 }: EditorPaneProps) {
-  const containerClassName = ["flex flex-col flex-1", className]
+  const containerClassName = ["flex min-h-0 flex-1 flex-col", className]
     .filter(Boolean)
     .join(" ");
 

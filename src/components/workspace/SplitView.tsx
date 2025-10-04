@@ -29,28 +29,55 @@ export function SplitView({
     minHeight: isMobile ? "calc(100vh - 180px)" : "65vh",
   } satisfies React.CSSProperties;
 
-  const editorStyle: CSSProperties = {
-    height: isMobile ? `${splitRatio * 100}%` : "auto",
-    width: isMobile ? "100%" : `${splitRatio * 100}%`,
-  };
+  const editorStyle: CSSProperties = isMobile
+    ? {
+        flexBasis: 0,
+        flexGrow: splitRatio,
+        flexShrink: 1,
+        minHeight: 0,
+        width: "100%",
+      }
+    : {
+        flexBasis: 0,
+        flexGrow: splitRatio,
+        flexShrink: 1,
+        minHeight: 0,
+        minWidth: 0,
+      };
 
-  const previewStyle: CSSProperties = {
-    height: isMobile ? `${(1 - splitRatio) * 100}%` : "auto",
-    width: isMobile ? "100%" : `${(1 - splitRatio) * 100}%`,
-  };
+  const previewStyle: CSSProperties = isMobile
+    ? {
+        flexBasis: 0,
+        flexGrow: 1 - splitRatio,
+        flexShrink: 1,
+        minHeight: 0,
+        width: "100%",
+      }
+    : {
+        flexBasis: 0,
+        flexGrow: 1 - splitRatio,
+        flexShrink: 1,
+        minHeight: 0,
+        minWidth: 0,
+      };
 
   return (
-    <div className="flex h-full w-full items-stretch" style={containerStyle}>
+    <div
+      className="flex min-h-0 flex-1 w-full items-stretch"
+      style={containerStyle}
+    >
       <EditorPane
         value={markdown}
         onChange={onMarkdownChange}
         style={editorStyle}
+        className="min-w-0"
       />
 
       <div
         onPointerDown={onResizeHandleDown}
         className="relative select-none touch-none"
         style={{
+          flex: "0 0 auto",
           width: isMobile ? "100%" : "8px",
           height: isMobile ? "16px" : "auto",
           cursor: isMobile ? "row-resize" : "col-resize",
@@ -72,6 +99,7 @@ export function SplitView({
         html={previewHtml}
         isRendering={isRendering}
         style={previewStyle}
+        className="min-w-0"
       />
     </div>
   );
