@@ -53,7 +53,9 @@ export const metadata: Metadata = {
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
     other: [
       {
         rel: "android-chrome-192x192",
@@ -114,13 +116,18 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "WebApplication",
     name: "Markdown Viewer",
-    alternateName: ["MD Viewer", "Online Markdown Editor", "Markdown Editor Online"],
+    alternateName: [
+      "MD Viewer",
+      "Online Markdown Editor",
+      "Markdown Editor Online",
+    ],
     url: "https://md.built.systems",
     description:
       "Free online markdown editor with real-time preview, Mermaid diagram rendering, syntax highlighting, and split-view editing. Edit and preview markdown files instantly in your browser without installation.",
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Any",
-    browserRequirements: "Requires JavaScript. Works with Chrome, Firefox, Safari, Edge.",
+    browserRequirements:
+      "Requires JavaScript. Works with Chrome, Firefox, Safari, Edge.",
     offers: {
       "@type": "Offer",
       price: "0",
@@ -147,16 +154,19 @@ export default function RootLayout({
     inLanguage: "en-US",
     audience: {
       "@type": "Audience",
-      audienceType: "Developers, technical writers, documentation authors, students, researchers, content creators",
+      audienceType:
+        "Developers, technical writers, documentation authors, students, researchers, content creators",
     },
-    keywords: "markdown editor, online markdown, markdown preview, mermaid diagrams, syntax highlighting, free markdown editor",
+    keywords:
+      "markdown editor, online markdown, markdown preview, mermaid diagrams, syntax highlighting, free markdown editor",
     sourceOrganization: {
       "@type": "Organization",
       name: "Open Source",
       url: "https://github.com/sasanktumpati/markdown-viewer-web",
     },
     codeRepository: "https://github.com/sasanktumpati/markdown-viewer-web",
-    license: "https://github.com/sasanktumpati/markdown-viewer-web/blob/main/LICENSE",
+    license:
+      "https://github.com/sasanktumpati/markdown-viewer-web/blob/main/LICENSE",
   };
 
   return (
