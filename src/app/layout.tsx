@@ -1,7 +1,7 @@
-import { ReactScan } from "@/components/ReactScan";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
+import { ReactScan } from "@/components/ReactScan";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Free Markdown Editor Online - Live Preview & Mermaid Diagrams",
+    default: "Markdown Editor Online - Live Preview & Mermaid Diagrams",
     template: "%s | Markdown Viewer",
   },
   description:
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "Free Markdown Editor Online - Live Preview & Mermaid Diagrams",
+    title: "Markdown Editor Online - Live Preview & Mermaid Diagrams",
     description:
       "Edit markdown online with live preview. Free browser-based editor with Mermaid diagrams & syntax highlighting. Start editing instantly - no signup required.",
     url: "https://md.built.systems",
@@ -172,9 +172,45 @@ export default function RootLayout({
   return (
     <html lang="en">
       <ReactScan />
+      <Script id="gtm" strategy="beforeInteractive">
+        {`
+          (function(w,d,s,l,i){
+            w[l]=w[l]||[];
+            w[l].push({'gtm.start': new Date().getTime(), event:'gtm.js'});
+            var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),
+              dl=l!='dataLayer'?'&l='+l:'';
+            j.async=true;
+            j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+            f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-T4XXN5JB');
+        `}
+      </Script>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-T4XXN5JB"
+            height="0"
+            width="0"
+            title="Google Tag Manager"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-GC8VVL0NHE"
+          strategy="beforeInteractive"
+        />
+        <Script id="gtag-init" strategy="beforeInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-GC8VVL0NHE');
+          `}
+        </Script>
         <Script
           id="ld-json"
           type="application/ld+json"
