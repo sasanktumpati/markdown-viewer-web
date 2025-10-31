@@ -12,12 +12,14 @@ type WorkspaceState = {
   previewWidthRatio: number;
   isMobile: boolean;
   isPreviewFullWidth: boolean;
+  isDarkMode: boolean;
   setMarkdown: (value: string) => void;
   setViewMode: (value: ViewMode) => void;
   setSplitRatio: (value: number) => void;
   setPreviewWidthRatio: (value: number) => void;
   setIsMobile: (value: boolean) => void;
   setIsPreviewFullWidth: (value: boolean) => void;
+  setIsDarkMode: (value: boolean) => void;
 };
 
 const STORAGE_KEY = "markdown-workspace";
@@ -35,12 +37,14 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       previewWidthRatio: 0.7,
       isMobile: false,
       isPreviewFullWidth: false,
+      isDarkMode: false,
       setMarkdown: (value) => set({ markdown: value }),
       setViewMode: (value) => set({ viewMode: value }),
       setSplitRatio: (value) => set({ splitRatio: value }),
       setPreviewWidthRatio: (value) => set({ previewWidthRatio: value }),
       setIsMobile: (value) => set({ isMobile: value }),
       setIsPreviewFullWidth: (value) => set({ isPreviewFullWidth: value }),
+      setIsDarkMode: (value) => set({ isDarkMode: value }),
     }),
     {
       name: STORAGE_KEY,
@@ -50,6 +54,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         viewMode: state.viewMode,
         splitRatio: state.splitRatio,
         previewWidthRatio: state.previewWidthRatio,
+        isDarkMode: state.isDarkMode,
       }),
     },
   ),

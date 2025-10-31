@@ -37,6 +37,8 @@ export default function MarkdownPreview() {
   const setIsPreviewFullWidth = useWorkspaceStore(
     (state) => state.setIsPreviewFullWidth,
   );
+  const isDarkMode = useWorkspaceStore((state) => state.isDarkMode);
+  const setIsDarkMode = useWorkspaceStore((state) => state.setIsDarkMode);
 
   const { fallbackHtml, isRendering } = useMarkdownRenderer(markdown);
 
@@ -86,9 +88,14 @@ export default function MarkdownPreview() {
       return;
     }
     const root = document.documentElement;
-    root.classList.remove("dark");
-    root.style.colorScheme = "light";
-  }, []);
+    if (isDarkMode) {
+      root.classList.add("dark");
+      root.style.colorScheme = "dark";
+    } else {
+      root.classList.remove("dark");
+      root.style.colorScheme = "light";
+    }
+  }, [isDarkMode]);
 
   useEffect(() => {
     if (viewMode) {
@@ -143,10 +150,19 @@ export default function MarkdownPreview() {
     />
   ) : null;
 
+  const handleDarkModeToggle = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-3 px-3 py-4 sm:gap-4 sm:px-4 sm:py-6 md:px-6 md:py-8">
-        <WorkspaceHeader viewMode={viewMode} onViewModeChange={setViewMode} />
+        <WorkspaceHeader
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          isDarkMode={isDarkMode}
+          onDarkModeToggle={handleDarkModeToggle}
+        />
 
         <main
           ref={containerRef}
