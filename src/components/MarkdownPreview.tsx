@@ -7,6 +7,7 @@ import { EditorPane } from "@/components/workspace/EditorPane";
 import { PreviewPane } from "@/components/workspace/PreviewPane";
 import { SplitView } from "@/components/workspace/SplitView";
 import { WorkspaceHeader } from "@/components/workspace/WorkspaceHeader";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useMarkdownRenderer } from "@/hooks/useMarkdownRenderer";
 import { usePointerResize } from "@/hooks/usePointerResize";
 import { useWorkspaceStore } from "@/store/useWorkspaceStore";
@@ -53,6 +54,11 @@ export default function MarkdownPreview() {
     previewWidthRatio,
     onSplitRatioChange: setSplitRatio,
     onPreviewWidthRatioChange: setPreviewWidthRatio,
+  });
+
+  useKeyboardShortcuts({
+    onViewModeChange: setViewMode,
+    currentViewMode: viewMode,
   });
 
   useEffect(() => {
