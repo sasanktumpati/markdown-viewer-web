@@ -59,6 +59,7 @@ export default function MarkdownPreview() {
   useKeyboardShortcuts({
     onViewModeChange: setViewMode,
     currentViewMode: viewMode,
+    onToggleFullWidth: () => setIsPreviewFullWidth(!isPreviewFullWidth),
   });
 
   useEffect(() => {
@@ -129,8 +130,8 @@ export default function MarkdownPreview() {
     if (isPreviewFullWidth) {
       return {
         width: "100%",
-        maxWidth: PREVIEW_MAX_WIDTH,
-        minWidth: PREVIEW_MIN_WIDTH,
+        maxWidth: "100%",
+        minWidth: 0,
         flexGrow: 1,
         flexShrink: 1,
         flexBasis: "auto",
@@ -197,14 +198,14 @@ export default function MarkdownPreview() {
 
           {viewMode === "preview" && (
             <div
-              className="flex min-h-0 flex-1 items-stretch justify-center px-3 py-4 sm:px-4 sm:py-6"
+              className={`flex min-h-0 flex-1 items-stretch ${isPreviewFullWidth ? "" : "justify-center px-3 py-4 sm:px-4 sm:py-6"}`}
               style={{ minHeight }}
             >
               <PreviewPane
                 html={fallbackHtml}
                 isRendering={isRendering}
                 style={previewStyle}
-                className="border border-border"
+                className={isPreviewFullWidth ? "" : "border border-border"}
                 actions={previewActions}
                 showResizeHandle={!isPreviewFullWidth && !isMobile}
                 onResizeHandleDown={startPreviewResize}

@@ -4,11 +4,13 @@ import type { ViewMode } from "@/store/useWorkspaceStore";
 type UseKeyboardShortcutsProps = {
   onViewModeChange: (mode: ViewMode) => void;
   currentViewMode: ViewMode;
+  onToggleFullWidth?: () => void;
 };
 
 export function useKeyboardShortcuts({
   onViewModeChange,
   currentViewMode,
+  onToggleFullWidth,
 }: UseKeyboardShortcutsProps) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -22,9 +24,16 @@ export function useKeyboardShortcuts({
 
         onViewModeChange(nextMode);
       }
+
+      if (event.key === "f" || event.key === "F") {
+        if (currentViewMode === "preview" && onToggleFullWidth) {
+          event.preventDefault();
+          onToggleFullWidth();
+        }
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [currentViewMode, onViewModeChange]);
+  }, [currentViewMode, onViewModeChange, onToggleFullWidth]);
 }
