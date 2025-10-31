@@ -7,7 +7,6 @@ import { EditorPane } from "@/components/workspace/EditorPane";
 import { PreviewPane } from "@/components/workspace/PreviewPane";
 import { SplitView } from "@/components/workspace/SplitView";
 import { WorkspaceHeader } from "@/components/workspace/WorkspaceHeader";
-import { useAutoDarkMode } from "@/hooks/useAutoDarkMode";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useMarkdownRenderer } from "@/hooks/useMarkdownRenderer";
 import { usePointerResize } from "@/hooks/usePointerResize";
@@ -41,11 +40,6 @@ export default function MarkdownPreview() {
   );
   const isDarkMode = useWorkspaceStore((state) => state.isDarkMode);
   const setIsDarkMode = useWorkspaceStore((state) => state.setIsDarkMode);
-  const setIsAutoDarkMode = useWorkspaceStore(
-    (state) => state.setIsAutoDarkMode,
-  );
-
-  useAutoDarkMode();
 
   const { fallbackHtml, isRendering } = useMarkdownRenderer(markdown);
 
@@ -165,7 +159,6 @@ export default function MarkdownPreview() {
 
   const handleDarkModeToggle = () => {
     setIsDarkMode(!isDarkMode);
-    setIsAutoDarkMode(false);
   };
 
   return (

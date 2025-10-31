@@ -1,12 +1,21 @@
 "use client";
 
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import remarkDirective from "remark-directive";
+import remarkFrontmatter from "remark-frontmatter";
+import remarkRehype from "remark-rehype";
+import rehypeFormat from "rehype-format";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
+import rehypeHighlight from "rehype-highlight";
+import rehypeStringify from "rehype-stringify";
+import mermaid from "mermaid";
 
-import "highlight.js/styles/github.css";
-
-type MarkdownRenderer = (markdown: string) => Promise<string>;
-
-let rendererPromise: Promise<MarkdownRenderer> | null = null;
+import "highlight.js/styles/github-dark.css";
 
 const FALLBACK_ERROR_HTML =
   '<p class="text-destructive">Error parsing markdown.</p>';
@@ -14,113 +23,48 @@ const FALLBACK_ERROR_HTML =
 const FALLBACK_EMPTY_HTML =
   '<p class="text-muted-foreground">Start typing to see a formatted preview.</p>';
 
-const uniqueId = () => {
-  if (typeof crypto !== "undefined" && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-  return Math.random().toString(36).slice(2);
-};
+const processor = unified()
+  .use(remarkParse)
+  .use(remarkGfm)
+  .use(remarkMath)
+  .use(remarkDirective)
+  .use(remarkFrontmatter)
+  .use(remarkRehype, { allowDangerousHtml: true })
+  .use(rehypeRaw)
+  .use(rehypeSanitize)
+  .use(rehypeHighlight, { ignoreMissing: true })
+  .use(rehypeFormat)
+  .use(rehypeStringify);
 
-async function createMarkdownRenderer(): Promise<MarkdownRenderer> {
-  const [{ marked }, { default: mermaid }, { default: hljs }] =
-    await Promise.all([
-      import("marked"),
-      import("mermaid"),
-      import("highlight.js/lib/common"),
-    ]);
+async function renderMarkdown(markdown: string): Promise<string> {
+  try {
+    const file = await processor.process(markdown);
+    let html = String(file);
 
-  mermaid.initialize({
-    startOnLoad: false,
-    theme: "default",
-    securityLevel: "loose",
-  });
-
-  const renderer = new marked.Renderer();
-  const originalCode = renderer.code.bind(renderer);
-
-  renderer.code = (code) => {
-    const { text, lang } = code;
-    const info = lang ?? "";
-    const rawLang = info.trim().split(/\s+/, 1)[0]?.toLowerCase() ?? "";
-    const isSafeLang = /^[0-9a-z+-]+$/i.test(rawLang);
-    const language = isSafeLang ? rawLang : "";
-
-    if (language === "mermaid") {
-      return originalCode(code);
-    }
-
-    let highlighted = "";
-    let detectedLang = language;
-
-    try {
-      if (language && hljs.getLanguage(language)) {
-        highlighted = hljs.highlight(text, { language }).value;
-      } else {
-        const autoResult = hljs.highlightAuto(text);
-        highlighted = autoResult.value;
-        detectedLang = autoResult.language?.toLowerCase() ?? detectedLang;
-      }
-    } catch (error) {
-      console.error("Highlight error:", error);
-      return originalCode(code);
-    }
-
-    const classNames = ["hljs"];
-    if (detectedLang && /^[0-9a-z+-]+$/i.test(detectedLang)) {
-      classNames.push(`language-${detectedLang}`);
-    }
-
-    return `<pre><code class="${classNames.join(" ")}">${highlighted}</code></pre>`;
-  };
-
-  marked.use({ renderer, async: true, gfm: true });
-
-  return async (markdown: string) => {
-    const parsedHtml = await marked.parse(markdown, { async: true });
+    // Mermaid rendering
     const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = parsedHtml;
-
-    const codeBlocks = Array.from(
-      tempDiv.querySelectorAll<HTMLPreElement>("code.language-mermaid"),
-    );
-
+    tempDiv.innerHTML = html;
+    const mermaidElements = tempDiv.querySelectorAll(".language-mermaid");
     await Promise.all(
-      codeBlocks.map(async (codeBlock, index) => {
-        const mermaidCode = codeBlock.textContent ?? "";
-        if (!mermaidCode) {
-          return;
-        }
-
+      Array.from(mermaidElements).map(async (element, i) => {
+        const id = `mermaid-diagram-${i}`;
+        const code = element.textContent || "";
         try {
-          const { svg } = await mermaid.render(
-            `mermaid-${index}-${uniqueId()}`,
-            mermaidCode,
-          );
-
-          const pre = codeBlock.parentElement;
-          if (!pre) {
-            return;
-          }
-
-          const div = document.createElement("div");
-          div.className = "mermaid-diagram";
-          div.innerHTML = svg;
-          pre.replaceWith(div);
+          const { svg } = await mermaid.render(id, code);
+          element.innerHTML = svg;
         } catch (error) {
           console.error("Mermaid rendering error:", error);
+          element.innerHTML = "Error rendering Mermaid diagram.";
         }
       }),
     );
+    html = tempDiv.innerHTML;
 
-    return tempDiv.innerHTML;
-  };
-}
-
-async function getMarkdownRenderer(): Promise<MarkdownRenderer> {
-  if (!rendererPromise) {
-    rendererPromise = createMarkdownRenderer();
+    return html;
+  } catch (error) {
+    console.error("Markdown rendering error:", error);
+    return FALLBACK_ERROR_HTML;
   }
-  return rendererPromise;
 }
 
 type RenderState = {
@@ -138,51 +82,25 @@ export function useMarkdownRenderer(markdown: string): RenderState & {
   });
 
   useEffect(() => {
+    mermaid.initialize({ startOnLoad: false });
+  }, []);
+
+  useEffect(() => {
     const trimmed = deferredMarkdown.trim();
 
     if (!trimmed) {
-      setState((previous) =>
-        previous.html === "" && !previous.isRendering
-          ? previous
-          : { html: "", isRendering: false },
-      );
+      setState({ html: "", isRendering: false });
       return;
     }
 
     let cancelled = false;
-    setState((previous) =>
-      previous.isRendering ? previous : { ...previous, isRendering: true },
-    );
+    setState((previous) => ({ ...previous, isRendering: true }));
 
-    const render = async () => {
-      try {
-        const renderer = await getMarkdownRenderer();
-        const html = await renderer(trimmed);
-        if (cancelled) {
-          return;
-        }
-
-        setState((previous) => {
-          if (previous.html === html) {
-            return previous.isRendering
-              ? { ...previous, isRendering: false }
-              : previous;
-          }
-          return { html, isRendering: false };
-        });
-      } catch (error) {
-        console.error("Markdown parsing error:", error);
-        if (!cancelled) {
-          setState((previous) =>
-            previous.html === FALLBACK_ERROR_HTML && !previous.isRendering
-              ? previous
-              : { html: FALLBACK_ERROR_HTML, isRendering: false },
-          );
-        }
+    renderMarkdown(trimmed).then((html) => {
+      if (!cancelled) {
+        setState({ html, isRendering: false });
       }
-    };
-
-    render();
+    });
 
     return () => {
       cancelled = true;
