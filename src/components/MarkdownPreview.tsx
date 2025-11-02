@@ -67,6 +67,20 @@ export default function MarkdownPreview() {
       return;
     }
 
+    const stored = localStorage.getItem("markdown-workspace");
+    if (!stored || !stored.includes('"isDarkMode"')) {
+      const systemPrefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)",
+      ).matches;
+      setIsDarkMode(systemPrefersDark);
+    }
+  }, [setIsDarkMode]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
     const mediaQuery = window.matchMedia("(max-width: 768px)");
     const applyMatch = (matches: boolean) => {
       if (useWorkspaceStore.getState().isMobile !== matches) {
