@@ -78,15 +78,15 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           createdAt: Date.now(),
           updatedAt: Date.now(),
         };
-        set((state) => ({
+        set((state: WorkspaceState) => ({
           sessions: { ...state.sessions, [id]: newSession },
           currentSessionId: id,
         }));
         return id;
       },
 
-      updateSession: (id, updates) => {
-        set((state) => {
+      updateSession: (id: string, updates: Partial<Session>) => {
+        set((state: WorkspaceState) => {
           const session = state.sessions[id];
           if (!session) return state;
           return {
@@ -98,8 +98,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         });
       },
 
-      deleteSession: (id) => {
-        set((state) => {
+      deleteSession: (id: string) => {
+        set((state: WorkspaceState) => {
           const { [id]: _deleted, ...remainingSessions } = state.sessions;
           const sessionIds = Object.keys(remainingSessions);
 
@@ -133,20 +133,22 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         });
       },
 
-      setCurrentSessionId: (id) => set({ currentSessionId: id }),
+      setCurrentSessionId: (id: string) => set({ currentSessionId: id }),
 
-      setMarkdown: (value) => {
+      setMarkdown: (value: string) => {
         const { currentSessionId, updateSession } = get();
         updateSession(currentSessionId, { content: value });
       },
 
-      setSidebarOpen: (isOpen) => set({ isSidebarOpen: isOpen }),
-      setViewMode: (value) => set({ viewMode: value }),
-      setSplitRatio: (value) => set({ splitRatio: value }),
-      setPreviewWidthRatio: (value) => set({ previewWidthRatio: value }),
-      setIsMobile: (value) => set({ isMobile: value }),
-      setIsPreviewFullWidth: (value) => set({ isPreviewFullWidth: value }),
-      setIsDarkMode: (value) => set({ isDarkMode: value }),
+      setSidebarOpen: (isOpen: boolean) => set({ isSidebarOpen: isOpen }),
+      setViewMode: (value: ViewMode) => set({ viewMode: value }),
+      setSplitRatio: (value: number) => set({ splitRatio: value }),
+      setPreviewWidthRatio: (value: number) =>
+        set({ previewWidthRatio: value }),
+      setIsMobile: (value: boolean) => set({ isMobile: value }),
+      setIsPreviewFullWidth: (value: boolean) =>
+        set({ isPreviewFullWidth: value }),
+      setIsDarkMode: (value: boolean) => set({ isDarkMode: value }),
     }),
     {
       name: STORAGE_KEY,
