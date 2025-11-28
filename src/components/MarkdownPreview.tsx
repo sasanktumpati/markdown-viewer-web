@@ -3,8 +3,10 @@
 import type { CSSProperties } from "react";
 import { useEffect, useMemo } from "react";
 
+import { CommandPalette } from "@/components/workspace/CommandPalette";
 import { EditorPane } from "@/components/workspace/EditorPane";
 import { PreviewPane } from "@/components/workspace/PreviewPane";
+import { Sidebar } from "@/components/workspace/Sidebar";
 import { SplitView } from "@/components/workspace/SplitView";
 import { WorkspaceHeader } from "@/components/workspace/WorkspaceHeader";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
@@ -18,7 +20,8 @@ const PREVIEW_MIN_WIDTH = "280px";
 const PREVIEW_MAX_WIDTH = "960px";
 
 export default function MarkdownPreview() {
-  const markdown = useWorkspaceStore((state) => state.markdown);
+  const sessions = useWorkspaceStore((state) => state.sessions);
+  const currentSessionId = useWorkspaceStore((state) => state.currentSessionId);
   const setMarkdown = useWorkspaceStore((state) => state.setMarkdown);
   const viewMode = useWorkspaceStore((state) => state.viewMode);
   const setViewMode = useWorkspaceStore((state) => state.setViewMode);
@@ -40,6 +43,9 @@ export default function MarkdownPreview() {
   );
   const isDarkMode = useWorkspaceStore((state) => state.isDarkMode);
   const setIsDarkMode = useWorkspaceStore((state) => state.setIsDarkMode);
+
+  // Derive markdown from current session
+  const markdown = sessions[currentSessionId]?.content || "";
 
   const { fallbackHtml, isRendering } = useMarkdownRenderer(markdown);
 
@@ -176,8 +182,10 @@ export default function MarkdownPreview() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-3 px-3 py-4 sm:gap-4 sm:px-4 sm:py-6 md:px-6 md:py-8">
+    <div className="flex min-h-screen bg-background text-foreground">
+      <Sidebar />
+      <CommandPalette />
+      <div className="mx-auto flex min-h-screen w-full min-w-0 max-w-7xl flex-1 flex-col gap-3 px-3 py-4 sm:gap-4 sm:px-4 sm:py-6 md:px-6 md:py-8">
         <WorkspaceHeader
           viewMode={viewMode}
           onViewModeChange={setViewMode}
