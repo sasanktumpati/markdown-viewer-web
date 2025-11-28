@@ -44,7 +44,9 @@ export function WorkspaceHeader({
           onClick={onDarkModeToggle}
           className="group relative h-9 w-9 rounded-[var(--radius-lg)] border border-border bg-background text-muted-foreground transition-all hover:border-foreground hover:text-foreground"
           title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-          aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+          aria-label={
+            isDarkMode ? "Switch to light mode" : "Switch to dark mode"
+          }
         >
           <span className="absolute inset-0 flex items-center justify-center transition-all duration-300">
             {isDarkMode ? <MoonIcon /> : <SunIcon />}
